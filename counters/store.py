@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS counters (
     supply          INTEGER,
     fee             INTEGER,
     vsize           INTEGER,
+    xcp_burned      INTEGER,
     created_at      TEXT    DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_counters_asset ON counters(asset);
@@ -63,6 +64,7 @@ class CounterRecord:
     supply: int | None = None
     fee: int | None = None
     vsize: int | None = None
+    xcp_burned: int | None = None
 
 
 class Store:
@@ -79,7 +81,7 @@ class Store:
         """Add columns introduced after a DB was first created (CREATE TABLE
         IF NOT EXISTS never alters an existing table)."""
         cols = {r["name"] for r in self.db.execute("PRAGMA table_info(counters)")}
-        for col in ("divisible", "supply", "fee", "vsize"):
+        for col in ("divisible", "supply", "fee", "vsize", "xcp_burned"):
             if col not in cols:
                 self.db.execute(f"ALTER TABLE counters ADD COLUMN {col} INTEGER")
 
@@ -128,8 +130,9 @@ class Store:
             INSERT INTO counters (
                 number, asset, asset_id, asset_longname, content_type,
                 content_sha256, content_length, mint_txid, block_index,
-                block_position, cp_tx_index, owner, divisible, supply, fee, vsize
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                block_position, cp_tx_index, owner, divisible, supply, fee, vsize,
+                xcp_burned
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 number,
@@ -148,6 +151,7 @@ class Store:
                 rec.supply,
                 rec.fee,
                 rec.vsize,
+                rec.xcp_burned,
             ),
         )
 
@@ -166,6 +170,14 @@ class Store:
         self.db.execute(
             "UPDATE counters SET fee = ?, vsize = ? WHERE number = ?",
             (fee, vsize, number),
+        )
+        self.db.commit()
+
+    def set_xcp_burned(self, number: int, xcp_burned: int | None) -> None:
+        """Backfill the XCP burned for the issuance (lazy enrichment)."""
+        self.db.execute(
+            "UPDATE counters SET xcp_burned = ? WHERE number = ?",
+            (xcp_burned, number),
         )
         self.db.commit()
 

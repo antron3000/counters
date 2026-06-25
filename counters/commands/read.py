@@ -95,11 +95,27 @@ def cmd_info(
             except (BitcoindError, KeyError, IndexError, TypeError):
                 pass
 
+        # XCP burned for the issuance comes from Counterparty (the issuance row).
+        xcp_burned = row["xcp_burned"]
+        if xcp_burned is None:
+            try:
+                cp = CounterpartyClient(config)
+                rows = cp.get_block_issuances(row["block_index"]).get(row["mint_txid"], [])
+                xcp_burned = next(
+                    (int(r["fee_paid"]) for r in rows
+                     if cp.is_creation(r) and r.get("fee_paid") is not None),
+                    None,
+                )
+                store.set_xcp_burned(row["number"], xcp_burned)
+            except CounterpartyError:
+                pass
+
         if as_json:
             record = {k: row[k] for k in row.keys()}
             record["current_owner"] = owner
             record["fee"] = fee
             record["vsize"] = vsize
+            record["xcp_burned"] = xcp_burned
             print(json.dumps(record, indent=2))
             return 0
 
@@ -115,6 +131,8 @@ def cmd_info(
         if fee is not None:
             rate = f" ({fee / vsize:.1f} sat/vB)" if vsize else ""
             print(f"fee          : {fee:,} sats{rate}")
+        if xcp_burned is not None:
+            print(f"xcp_burned   : {xcp_burned / 1e8:g} XCP")
     finally:
         store.close()
     return 0

@@ -161,6 +161,7 @@ class Indexer:
             supply=asset_info.get("supply"),
             fee=fee,
             vsize=vsize,
+            xcp_burned=issuance.get("fee_paid"),
         )
         self.store.add_counter(number, rec)
         self._notify(

@@ -129,7 +129,8 @@ def test_records_a_valid_counter():
     body = b"\x89PNG\r\n\x1a\n fake png bytes"
     block = make_block(height, txid, b"image/png", body)
     issuances = {txid: [{"asset": "RAREPEPE", "status": "valid", "asset_events": "creation",
-                          "tx_index": 12345, "asset_longname": None, "issuer": "1IssuerAddr"}]}
+                          "tx_index": 12345, "asset_longname": None, "issuer": "1IssuerAddr",
+                          "fee_paid": 50000000}]}
     assets = {"RAREPEPE": {"asset_id": "9876543210", "owner": "1OwnerAddr", "asset_longname": None,
                             "divisible": True, "supply": 1000000000}}
 
@@ -151,6 +152,7 @@ def test_records_a_valid_counter():
         assert row["divisible"] == 1  # stored as int
         assert row["supply"] == 1000000000
         assert row["fee"] == 1000 and row["vsize"] == 200  # mint fee captured
+        assert row["xcp_burned"] == 50000000  # 0.5 XCP burned for the named asset
 
         # blob content round-trips by sha256
         expected_sha = hashlib.sha256(body).hexdigest()

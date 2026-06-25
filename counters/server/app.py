@@ -100,6 +100,7 @@ def record_dict(store: Store, row: sqlite3.Row, *, owner: str | None = None,
         "sha256": row["content_sha256"],
         "fee": row["fee"],
         "vsize": row["vsize"],
+        "xcp_burned": row["xcp_burned"],
         "body": _inline_body(store, row) if with_body else None,
     }
 
@@ -194,6 +195,8 @@ class Handler(BaseHTTPRequestHandler):
             rec = record_dict(store, row, owner=owner)
             if rec["fee"] is None:
                 rec["fee"], rec["vsize"] = self._ensure_fee(store, row)
+            if rec["xcp_burned"] is None:
+                rec["xcp_burned"] = self._ensure_xcp_burned(store, row)
             self._json(rec)
         finally:
             store.close()
@@ -208,6 +211,23 @@ class Handler(BaseHTTPRequestHandler):
         except Exception:
             log.debug("fee backfill failed for #%s", row["number"], exc_info=True)
             return None, None
+
+    def _ensure_xcp_burned(self, store: Store, row) -> int | None:
+        """Look up the XCP burned for the issuance from Counterparty once and
+        persist it (best effort — null if Core is unreachable)."""
+        try:
+            cp = CounterpartyClient(self.config)
+            rows = cp.get_block_issuances(row["block_index"]).get(row["mint_txid"], [])
+            burned = next(
+                (int(r["fee_paid"]) for r in rows
+                 if cp.is_creation(r) and r.get("fee_paid") is not None),
+                None,
+            )
+            store.set_xcp_burned(row["number"], burned)
+            return burned
+        except Exception:
+            log.debug("xcp_burned backfill failed for #%s", row["number"], exc_info=True)
+            return None
 
     def _content(self, number: int) -> None:
         store = Store(self.config)
