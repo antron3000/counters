@@ -1,6 +1,6 @@
 """CLI entry point.
 
-Invoke as `counter <command>` (after `pip install -e .`) or, equivalently,
+Invoke as `counters <command>` (after `pip install -e .`) or, equivalently,
 `python -m counters <command>`.
 """
 
@@ -72,11 +72,11 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     parser = argparse.ArgumentParser(
-        prog="counter",
+        prog="counters",
         description="Counterparty Inscriptions (Bitcoin Counters) — CLI + indexer",
         parents=[common],
         formatter_class=_OrdStyleHelp,
-        usage="counter [OPTIONS] <COMMAND>",
+        usage="counters [OPTIONS] <COMMAND>",
     )
     parser.set_defaults(verbose=False)
     parser._optionals.title = "Options"
@@ -118,7 +118,7 @@ def main(argv: list[str] | None = None) -> int:
     p_val.add_argument("txid")
 
     # --- wallet (taproot BIP86; keys held by Bitcoin Core) ---
-    # --name is a wallet-level option (counter wallet --name abc create); it is
+    # --name is a wallet-level option (counters wallet --name abc create); it is
     # also accepted after the subcommand via the SUPPRESS-default parent so it
     # never clobbers the wallet-level value when absent.
     wname = argparse.ArgumentParser(add_help=False)
@@ -128,7 +128,7 @@ def main(argv: list[str] | None = None) -> int:
         parents=[common],
         help="taproot wallet (keys in Bitcoin Core)",
         formatter_class=_OrdStyleHelp,
-        usage="counter wallet [--name NAME] <COMMAND>",
+        usage="counters wallet [--name NAME] <COMMAND>",
     )
     p_wallet.add_argument("--name", default="counter", help="Core wallet name (default: counter)")
     p_wallet._optionals.title = "Options"

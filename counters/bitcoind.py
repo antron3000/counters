@@ -78,7 +78,7 @@ class BitcoindClient:
                     )
                 raise BitcoindError(
                     f"wallet {wallet!r} does not exist. "
-                    f"Create it with: counter wallet create --name {wallet}"
+                    f"Create it with: counters wallet create --name {wallet}"
                 )
             raise BitcoindError(f"bitcoind RPC error for {method}: {msg}")
         return data["result"]

@@ -1,4 +1,4 @@
-"""`counter wallet` commands: create / restore / receive / balance / inscriptions.
+"""`counters wallet` commands: create / restore / receive / balance / inscriptions.
 
 Taproot-only (BIP86, bc1p). We generate the BIP39 mnemonic and derive the
 account key locally (see bip32.py), then import the tr() descriptors into a
@@ -114,7 +114,7 @@ def cmd_wallet_restore(config: Config, name: str) -> int:
     except BitcoindError as e:
         print(f"could not restore wallet: {e}", file=sys.stderr)
         return 1
-    print(f"restored wallet {name!r}; rescan complete. Check `counter wallet --name "
+    print(f"restored wallet {name!r}; rescan complete. Check `counters wallet --name "
           f"{name} balance`.")
     return 0
 

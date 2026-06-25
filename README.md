@@ -57,40 +57,40 @@ pip install -r requirements.txt
 
 ## Usage
 
-Invoke as `counter <command>` after `pip install -e .`, or equivalently
+Invoke as `counters <command>` after `pip install -e .`, or equivalently
 `python -m counters <command>`.
 
 ```bash
 # --- indexing ---
-counter index -v                                  # continuously sync + follow the tip
-counter sync --stop-at 720000                     # one-shot catch-up (bounded for tests)
+counters index -v                                  # continuously sync + follow the tip
+counters sync --stop-at 720000                     # one-shot catch-up (bounded for tests)
 
 # --- reads (need only a synced index) ---
-counter status                                    # bitcoind / Counterparty / index heights
-counter list                                      # 20 most recent
-counter list --recent 50
-counter list --owner bc1p...                      # by mint-time owner
-counter list --block 800000-800100                # by block range
-counter info 0                                    # metadata by number
-counter info RAREPEPE                             # ...or by asset name / longname
-counter info 0 --json                             # metadata as JSON
-counter info 0 --raw > cat.png                     # stream the file bytes
-counter info 0 --save cat.png                      # write the file to disk
-counter validate <txid>                           # is this tx a counter, and why / why not
+counters status                                    # bitcoind / Counterparty / index heights
+counters list                                      # 20 most recent
+counters list --recent 50
+counters list --owner bc1p...                      # by mint-time owner
+counters list --block 800000-800100                # by block range
+counters info 0                                    # metadata by number
+counters info RAREPEPE                             # ...or by asset name / longname
+counters info 0 --json                             # metadata as JSON
+counters info 0 --raw > cat.png                     # stream the file bytes
+counters info 0 --save cat.png                      # write the file to disk
+counters validate <txid>                           # is this tx a counter, and why / why not
 
 # --- wallet (taproot BIP86, bc1p; keys held by Bitcoin Core) ---
-counter wallet --name mywallet create             # new wallet; prints a 12-word seed ONCE
-counter wallet --name mywallet restore            # re-import from a seed (read on stdin) + rescan
-counter wallet --name mywallet receive            # next taproot (bc1p) address
-counter wallet --name mywallet balance            # BTC + aggregated Counterparty balances
-counter wallet --name mywallet inscriptions       # counters held by the wallet
+counters wallet --name mywallet create             # new wallet; prints a 12-word seed ONCE
+counters wallet --name mywallet restore            # re-import from a seed (read on stdin) + rescan
+counters wallet --name mywallet receive            # next taproot (bc1p) address
+counters wallet --name mywallet balance            # BTC + aggregated Counterparty balances
+counters wallet --name mywallet inscriptions       # counters held by the wallet
 
 # mint a counter from a file (commit + reveal). --dry-run builds, signs, and
 # package-validates both txs WITHOUT broadcasting (prints raw hex + cost).
-counter wallet --name mywallet inscribe --file cat.png --dry-run
-counter wallet --name mywallet inscribe --file cat.png                    # free numeric asset
-counter wallet --name mywallet inscribe --file cat.png --asset ZOMBIEPEPES # named (0.5 XCP)
-counter wallet --name mywallet inscribe --file cat.png --fee-rate 8 --commit-fee-rate 4
+counters wallet --name mywallet inscribe --file cat.png --dry-run
+counters wallet --name mywallet inscribe --file cat.png                    # free numeric asset
+counters wallet --name mywallet inscribe --file cat.png --asset ZOMBIEPEPES # named (0.5 XCP)
+counters wallet --name mywallet inscribe --file cat.png --fee-rate 8 --commit-fee-rate 4
 ```
 
 > The 12-word seed is the only backup and is shown once at create time. The

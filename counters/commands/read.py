@@ -1,4 +1,4 @@
-"""Read-side `counter` commands: status, info, list, validate.
+"""Read-side `counters` commands: status, info, list, validate.
 
 These are public and need only a synced index DB plus the two backends as
 oracles (bitcoind for raw tx/witness, Counterparty Core for issuance validity
