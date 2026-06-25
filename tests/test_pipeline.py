@@ -94,6 +94,9 @@ class FakeBitcoind:
     def get_fee_and_vsize(self, txid: str, tx: dict | None = None):
         return 1000, 200   # fixed enrichment; real client queries prevouts
 
+    def get_inscription_cost(self, reveal_txid: str, reveal_tx: dict | None = None):
+        return 1500, 300   # commit + reveal total (fixed for the fake)
+
 
 class FakeCounterparty:
     """Mirrors the real client's interface used by the indexer."""
@@ -151,7 +154,7 @@ def test_records_a_valid_counter():
         assert row["owner"] == "1OwnerAddr"
         assert row["divisible"] == 1  # stored as int
         assert row["supply"] == 1000000000
-        assert row["fee"] == 1000 and row["vsize"] == 200  # mint fee captured
+        assert row["fee"] == 1500 and row["vsize"] == 300  # commit + reveal cost captured
         assert row["xcp_burned"] == 50000000  # 0.5 XCP burned for the named asset
 
         # blob content round-trips by sha256
@@ -218,6 +221,29 @@ def test_empty_body_counter_is_recorded():
         assert row["content_length"] == 0
         assert row["content_sha256"] == hashlib.sha256(b"").hexdigest()
         idx.close()
+
+
+def test_inscription_cost_sums_commit_and_reveal():
+    """get_inscription_cost = reveal fee/vsize + the commit's, where the commit
+    is the prevout of the envelope-bearing (script-path) input."""
+    from counters.bitcoind import BitcoindClient
+
+    leaf = counter_leaf_script(b"text/plain", b"hi")
+    reveal_tx = {
+        "vin": [
+            {"txid": "change", "vout": 0, "txinwitness": ["aa" * 32]},        # not the envelope
+            {"txid": "commitabc", "vout": 1, "txinwitness": taproot_witness(leaf)},  # envelope
+        ],
+        "vout": [],
+        "vsize": 233,
+    }
+
+    class DuckBtc:
+        def get_fee_and_vsize(self, txid, tx=None):
+            return (200, 100) if txid == "commitabc" else (932, 233)
+
+    fee, vsize = BitcoindClient.get_inscription_cost(DuckBtc(), "revealxyz", reveal_tx=reveal_tx)
+    assert fee == 932 + 200 and vsize == 233 + 100
 
 
 if __name__ == "__main__":

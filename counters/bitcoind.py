@@ -12,6 +12,7 @@ from typing import Any
 import requests
 
 from .config import Config
+from .envelope import find_commit_txid
 
 COIN = 100_000_000  # sats per BTC
 
@@ -144,3 +145,25 @@ class BitcoindClient:
             prev = self.get_raw_transaction(vin["txid"], verbose=True)
             in_sats += round(prev["vout"][vin["vout"]]["value"] * COIN)
         return in_sats - out_sats, vsize
+
+    def get_inscription_cost(
+        self, reveal_txid: str, reveal_tx: dict | None = None
+    ) -> tuple[int | None, int | None]:
+        """Total fee (sats) and vsize (vBytes) to inscribe = commit + reveal.
+
+        The reveal is the mint tx; the commit is the tx whose output the reveal
+        script-path-spends (the prevout of the COUNT-envelope input). We sum both
+        so the displayed fee/rate reflect the whole inscription, not just the
+        reveal. Falls back to reveal-only if the commit can't be identified.
+        """
+        if reveal_tx is None:
+            reveal_tx = self.get_raw_transaction(reveal_txid, verbose=True)
+        fee, vsize = self.get_fee_and_vsize(reveal_txid, tx=reveal_tx)
+        commit_txid = find_commit_txid(reveal_tx.get("vin", []))
+        if commit_txid and commit_txid != reveal_txid:
+            cfee, cvsize = self.get_fee_and_vsize(commit_txid)
+            if fee is not None and cfee is not None:
+                fee += cfee
+            if vsize is not None and cvsize is not None:
+                vsize += cvsize
+        return fee, vsize

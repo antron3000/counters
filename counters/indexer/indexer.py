@@ -139,10 +139,10 @@ class Indexer:
         sha = self.store.store_blob(env.body)
         number = self.store.next_number()
         content_type = env.content_type.decode("utf-8", errors="replace") if env.content_type else None
-        # Mint fee/vsize are enrichment, never blockers: a fee-fetch failure must
-        # not stop a counter from being recorded.
+        # Inscription cost (commit + reveal) is enrichment, never a blocker: a
+        # fetch failure must not stop a counter from being recorded.
         try:
-            fee, vsize = self.btc.get_fee_and_vsize(txid, tx=tx)
+            fee, vsize = self.btc.get_inscription_cost(txid, reveal_tx=tx)
         except (BitcoindError, KeyError, IndexError, TypeError):
             fee, vsize = None, None
         rec = CounterRecord(

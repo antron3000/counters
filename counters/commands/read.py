@@ -86,11 +86,11 @@ def cmd_info(
 
         owner = _current_owner(config, row["asset"], row["owner"])
 
-        # Mint fee/vsize are computed on demand from bitcoind and cached.
+        # Inscription cost (commit + reveal) computed on demand and cached.
         fee, vsize = row["fee"], row["vsize"]
         if fee is None:
             try:
-                fee, vsize = BitcoindClient(config).get_fee_and_vsize(row["mint_txid"])
+                fee, vsize = BitcoindClient(config).get_inscription_cost(row["mint_txid"])
                 store.set_fee(row["number"], fee, vsize)
             except (BitcoindError, KeyError, IndexError, TypeError):
                 pass

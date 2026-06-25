@@ -202,10 +202,10 @@ class Handler(BaseHTTPRequestHandler):
             store.close()
 
     def _ensure_fee(self, store: Store, row) -> tuple[int | None, int | None]:
-        """Compute the mint fee/vsize from bitcoind once and persist it (best
-        effort — if the node is unreachable, leave it null)."""
+        """Compute the inscription cost (commit + reveal fee/vsize) from bitcoind
+        once and persist it (best effort — null if the node is unreachable)."""
         try:
-            fee, vsize = BitcoindClient(self.config).get_fee_and_vsize(row["mint_txid"])
+            fee, vsize = BitcoindClient(self.config).get_inscription_cost(row["mint_txid"])
             store.set_fee(row["number"], fee, vsize)
             return fee, vsize
         except Exception:

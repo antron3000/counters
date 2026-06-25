@@ -240,3 +240,17 @@ def find_counter_envelopes_in_tx(vin: list[dict]) -> list[CounterEnvelope]:
         if witness:
             found.extend(find_counter_envelopes_in_witness(witness))
     return found
+
+
+def find_commit_txid(vin: list[dict]) -> str | None:
+    """The commit transaction's txid, given a reveal's inputs.
+
+    The COUNT envelope is revealed by the input that script-path-spends the
+    commit output, so that input's prevout txid *is* the commit transaction.
+    Returns None if no envelope-bearing input is present.
+    """
+    for txin in vin:
+        witness = txin.get("txinwitness")
+        if witness and find_counter_envelopes_in_witness(witness):
+            return txin.get("txid")
+    return None
