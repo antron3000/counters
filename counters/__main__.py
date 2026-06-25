@@ -10,7 +10,7 @@ import argparse
 import logging
 import sys
 
-from .commands import inscribe, read, serve, wallet
+from .commands import inscribe, read, send, serve, wallet
 from .bitcoind import BitcoindError
 from .config import Config
 from .counterparty import CounterpartyError
@@ -161,6 +161,15 @@ def main(argv: list[str] | None = None) -> int:
     p_insc.add_argument("--dry-run", action="store_true",
                         help="build + sign both txs but do not broadcast; print raw hex")
 
+    p_send = wsub.add_parser(
+        "send", parents=[common, wname], help="transfer a counter (asset) to an address"
+    )
+    p_send.add_argument("asset", help="asset name or longname of the counter")
+    p_send.add_argument("amount", help="quantity to send (e.g. 1, or 0.5 for a divisible asset)")
+    p_send.add_argument("destination", help="recipient Bitcoin address")
+    p_send.add_argument("--dry-run", action="store_true",
+                        help="compose + sign + validate but do not broadcast; print raw hex")
+
     args = parser.parse_args(argv)
     _setup_logging(args.verbose)
 
@@ -217,6 +226,11 @@ def main(argv: list[str] | None = None) -> int:
                     asset=args.asset, fee_rate=args.fee_rate,
                     commit_fee_rate=args.commit_fee_rate, destination=args.destination,
                     supply=args.supply, divisible=args.divisible, dry_run=args.dry_run,
+                )
+            if args.wallet_command == "send":
+                return send.cmd_send(
+                    config, args.name, args.asset, args.amount, args.destination,
+                    dry_run=args.dry_run,
                 )
             dispatch = {
                 "create": wallet.cmd_wallet_create,

@@ -88,6 +88,8 @@ counters wallet --name mywallet restore            # re-import from a seed (read
 counters wallet --name mywallet receive            # next taproot (bc1p) address
 counters wallet --name mywallet balance            # BTC + aggregated Counterparty balances
 counters wallet --name mywallet inscriptions       # counters held by the wallet
+counters wallet --name mywallet send RAREPEPE 1 bc1p...        # transfer a counter
+counters wallet --name mywallet send RAREPEPE 1 bc1p... --dry-run  # compose+sign, no broadcast
 
 # mint a counter from a file (commit + reveal). --dry-run builds, signs, and
 # package-validates both txs WITHOUT broadcasting (prints raw hex + cost).
@@ -141,7 +143,6 @@ tests/
 
 ## Not yet implemented (v2+)
 
-- `send` — transfer a counter (Counterparty asset) via compose + Core sign
 - Reorg detection + renumbering with a finality depth
 - Frozen marker/genesis height + canonical test vectors
 - Gate indexing on Counterparty Core's processed height (don't index ahead of

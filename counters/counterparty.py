@@ -123,6 +123,26 @@ class CounterpartyClient:
             raise CounterpartyError(f"compose issuance failed: {data}")
         return data["result"]
 
+    def compose_send(
+        self, source: str, asset: str, quantity: int, destination: str
+    ) -> dict:
+        """Compose a Counterparty asset *send* (OP_RETURN) from `source` to
+        `destination`. `quantity` is in raw units (sats for divisible assets).
+        Returns Core's result dict including `rawtransaction` (unsigned).
+        """
+        params: dict[str, Any] = {
+            "asset": asset,
+            "quantity": quantity,
+            "destination": destination,
+            "encoding": "opreturn",
+            "allow_unconfirmed_inputs": "true",
+            "verbose": "true",
+        }
+        data = self._get(f"/v2/addresses/{source}/compose/send", params=params)
+        if not data or "result" not in data:
+            raise CounterpartyError(f"compose send failed: {data}")
+        return data["result"]
+
     # --- addresses ---------------------------------------------------------
 
     def get_address_balances(self, address: str) -> list[dict]:
