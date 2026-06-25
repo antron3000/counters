@@ -26,7 +26,7 @@ from .envelope import find_counter_envelopes_in_tx
 from .progress import ProgressBar
 from .store import CounterRecord, Store
 
-log = logging.getLogger("counter_indexer")
+log = logging.getLogger("indexer")
 
 
 class Indexer:

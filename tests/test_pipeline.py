@@ -16,10 +16,10 @@ import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from counter_indexer.config import Config  # noqa: E402
-from counter_indexer.counterparty import CounterpartyClient  # noqa: E402
-from counter_indexer.indexer import Indexer  # noqa: E402
-from counter_indexer.store import Store  # noqa: E402
+from indexer.config import Config  # noqa: E402
+from indexer.counterparty import CounterpartyClient  # noqa: E402
+from indexer.indexer import Indexer  # noqa: E402
+from indexer.store import Store  # noqa: E402
 
 
 # --- script/witness builders (canonical COUNT envelope) --------------------

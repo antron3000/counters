@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-counter = "counter_indexer.__main__:main"
+counter = "indexer.__main__:main"
 
 [tool.setuptools]
-packages = ["counter_indexer"]
+packages = ["indexer"]

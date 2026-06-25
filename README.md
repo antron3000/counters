@@ -58,7 +58,7 @@ pip install -r requirements.txt
 ## Usage
 
 Invoke as `counter <command>` after `pip install -e .`, or equivalently
-`python -m counter_indexer <command>`.
+`python -m indexer <command>`.
 
 ```bash
 # --- indexing ---
@@ -108,7 +108,7 @@ python tests/test_envelope.py   # zero-dependency runner
 ## Layout
 
 ```
-counter_indexer/
+indexer/
   config.py         protocol constants + env-driven Config
   bitcoind.py       JSON-RPC client (cookie auth, getblock witnesses)
   envelope.py       script tokenizer + COUNT envelope parser
