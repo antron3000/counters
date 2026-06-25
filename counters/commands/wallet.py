@@ -199,7 +199,7 @@ def cmd_wallet_inscriptions(config: Config, name: str) -> int:
         if not counters:
             print("no counters held by this wallet")
             return 0
-        print(f"{'#':>8}  {'asset':<26} {'content_type':<22} {'size':>8} {'held/supply':>16}")
+        print(f"{'#':>8}  {'asset':<26} {'size':>8} {'held/supply':>16}")
         for r, qty in counters:
             name_ = r["asset_longname"] or r["asset"]
             divisible, supply_raw = r["divisible"], r["supply"]
@@ -215,8 +215,7 @@ def cmd_wallet_inscriptions(config: Config, name: str) -> int:
             balance = f"{_fmt_amount(qty)}/{_fmt_amount(supply)}"
             print(
                 f"{r['number']:>8}  {name_[:26]:<26} "
-                f"{(r['content_type'] or '-')[:22]:<22} {r['content_length']:>8} "
-                f"{balance:>16}"
+                f"{r['content_length']:>8} {balance:>16}"
             )
     finally:
         store.close()
