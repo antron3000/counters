@@ -188,11 +188,6 @@ class Indexer:
         if bar is not None:
             bar.total = max(tip - floor + 1, 1)  # keep up with a moving tip
 
-        if span >= 2:
-            self._notify(
-                f"scanning blocks {start} \u2192 {tip} ({span} blocks; {base} counters so far)"
-            )
-
         total = 0
         try:
             if start > tip:
