@@ -181,6 +181,14 @@ class Store:
             "SELECT * FROM counters ORDER BY number DESC LIMIT ?", (limit,)
         ).fetchall()
 
+    def list_before(self, before: int, limit: int = 120) -> list[sqlite3.Row]:
+        """Newest-first page of counters with number < `before` (for the
+        explorer's 'load more' pagination)."""
+        return self.db.execute(
+            "SELECT * FROM counters WHERE number < ? ORDER BY number DESC LIMIT ?",
+            (before, limit),
+        ).fetchall()
+
     def list_by_owner(self, owner: str, limit: int = 1000) -> list[sqlite3.Row]:
         return self.db.execute(
             "SELECT * FROM counters WHERE owner = ? ORDER BY number ASC LIMIT ?",

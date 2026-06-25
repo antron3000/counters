@@ -78,6 +78,10 @@ counters info 0 --raw > cat.png                     # stream the file bytes
 counters info 0 --save cat.png                      # write the file to disk
 counters validate <txid>                           # is this tx a counter, and why / why not
 
+# --- web explorer + read-only JSON API ---
+counters server                                    # http://127.0.0.1:8080
+counters server --host 0.0.0.0 --port 8080         # bind publicly / pick a port
+
 # --- wallet (taproot BIP86, bc1p; keys held by Bitcoin Core) ---
 counters wallet --name mywallet create             # new wallet; prints a 12-word seed ONCE
 counters wallet --name mywallet restore            # re-import from a seed (read on stdin) + rescan
@@ -125,14 +129,18 @@ counters/
     read.py         status / info / list / validate
     wallet.py       create / restore / receive / balance / inscriptions
     inscribe.py     mint flow: compose issuance + build/sign commit & reveal
-pyproject.toml      installs the `counter` console command
+    serve.py        server command entry point
+  server/           web explorer + read-only JSON API
+    app.py          stdlib HTTP server (static SPA + /counters /counter /content)
+    index.html      single-page explorer
+    counters-*.svg/png   logos + favicon
+pyproject.toml      installs the `counters` console command
 tests/
   test_envelope.py  parser unit tests
 ```
 
 ## Not yet implemented (v2+)
 
-- `server` — read/serve HTTP API + `/content/<number>` blob serving
 - `send` — transfer a counter (Counterparty asset) via compose + Core sign
 - Reorg detection + renumbering with a finality depth
 - Frozen marker/genesis height + canonical test vectors

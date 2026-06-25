@@ -10,7 +10,7 @@ import argparse
 import logging
 import sys
 
-from .commands import inscribe, read, wallet
+from .commands import inscribe, read, serve, wallet
 from .bitcoind import BitcoindError
 from .config import Config
 from .counterparty import CounterpartyError
@@ -97,6 +97,12 @@ def main(argv: list[str] | None = None) -> int:
 
     p_sync = sub.add_parser("sync", parents=[common], help="sync once up to the tip and exit")
     p_sync.add_argument("--stop-at", type=int, default=None, help="stop at this block height")
+
+    p_server = sub.add_parser(
+        "server", parents=[common], help="serve the web explorer + read-only JSON API"
+    )
+    p_server.add_argument("--host", default="127.0.0.1", help="bind address (default: 127.0.0.1)")
+    p_server.add_argument("--port", type=int, default=8080, help="port (default: 8080)")
 
     # --- reads ---
     sub.add_parser("status", parents=[common], help="tips/health of all three backends")
@@ -196,6 +202,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "validate":
         return read.cmd_validate(config, args.txid)
+
+    if args.command == "server":
+        return serve.cmd_server(config, args.host, args.port)
 
     if args.command == "wallet":
         if not getattr(args, "wallet_command", None):
