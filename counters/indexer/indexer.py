@@ -179,35 +179,35 @@ class Indexer:
         if stop_at is not None:
             tip = min(tip, stop_at)
 
-        floor = self.config.start_height
         base = self.store.count()
         span = tip - start + 1
 
         # The daemon (run()) installs a PERSISTENT bar that is reused across
         # polls and always rendered, so it sits at 100% while caught up. A
         # one-shot `sync` of a multi-block range instead gets a transient bar
-        # that is closed when the pass ends. The bar tracks ABSOLUTE chain
-        # position (height/tip) so the count never resets on resume.
+        # that is closed when the pass ends. The bar shows the REAL block height
+        # (n/tip), so the displayed number is the actual chain position and the
+        # count never resets on resume; rate/ETA track work done this session.
         bar = self._progress
         own_bar = False
         if bar is None and span >= 2:
-            bar = ProgressBar(tip - floor + 1, desc="Indexing", initial=start - floor)
+            bar = ProgressBar(tip, desc="Indexing", initial=start - 1)
             self._progress = bar
             own_bar = True
         if bar is not None:
-            bar.total = max(tip - floor + 1, 1)  # keep up with a moving tip
+            bar.total = max(tip, 1)  # keep up with a moving tip
 
         total = 0
         try:
             if start > tip:
                 # Caught up: pin the bar at the current tip (100%) and idle.
                 if bar is not None:
-                    bar.update(tip - floor + 1, postfix=f"{base} counters")
+                    bar.update(tip, postfix=f"{base} counters")
                 return 0
             for height in range(start, tip + 1):
                 total += self.process_block(height)
                 if bar is not None:
-                    bar.update(height - floor + 1, postfix=f"{base + total} counters")
+                    bar.update(height, postfix=f"{base + total} counters")
                 if self._stop:
                     break
         finally:
@@ -229,13 +229,12 @@ class Indexer:
         # One persistent progress bar for the whole daemon: it stays on screen,
         # updates in place, and shows 100% whenever the index is caught up to
         # the chain tip. sync_to_tip() reuses it and keeps its total current.
-        floor = self.config.start_height
         try:
             tip = self.btc.get_block_count() - self.config.confirmations
         except Exception:
             tip = resume
         self._progress = ProgressBar(
-            max(tip - floor + 1, 1), desc="Indexing", initial=max(resume - floor, 0)
+            max(tip, 1), desc="Indexing", initial=max(resume - 1, 0)
         )
         try:
             while not self._stop:

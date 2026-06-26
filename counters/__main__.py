@@ -12,7 +12,7 @@ import sys
 
 from .commands import inscribe, read, send, serve, wallet
 from .bitcoind import BitcoindError
-from .config import Config
+from .config import COUNTERS_GENESIS_HEIGHT, TAPROOT_ACTIVATION_HEIGHT, Config
 from .counterparty import CounterpartyError
 from .indexer import Indexer
 
@@ -87,15 +87,32 @@ def main(argv: list[str] | None = None) -> int:
     parser._action_groups.insert(0, parser._action_groups.pop())
 
     # --- daemon / indexing ---
+    # Where a FIRST-TIME scan begins (ignored once the DB has stored progress).
+    # Default is block 0 (exhaustive); these flags raise the floor.
+    startfrom = argparse.ArgumentParser(add_help=False)
+    g_start = startfrom.add_mutually_exclusive_group()
+    g_start.add_argument(
+        "--from-taproot", action="store_true",
+        help=f"scan from taproot activation (block {TAPROOT_ACTIVATION_HEIGHT}); "
+             f"skips blocks that cannot carry a taproot reveal",
+    )
+    g_start.add_argument(
+        "--from-genesis", action="store_true",
+        help=f"scan from the counters genesis block ({COUNTERS_GENESIS_HEIGHT}, #0); "
+             f"trusts that no valid counter precedes it",
+    )
+
     # `run` is a backward-compatible alias for `index`.
     sub.add_parser(
         "index",
-        parents=[common],
+        parents=[common, startfrom],
         aliases=["run"],
         help="continuously sync to tip and follow new blocks",
     )
 
-    p_sync = sub.add_parser("sync", parents=[common], help="sync once up to the tip and exit")
+    p_sync = sub.add_parser(
+        "sync", parents=[common, startfrom], help="sync once up to the tip and exit"
+    )
     p_sync.add_argument("--stop-at", type=int, default=None, help="stop at this block height")
 
     p_server = sub.add_parser(
@@ -178,6 +195,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     config = Config()
+
+    # First-time scan floor (the DB's stored height wins on later runs).
+    if getattr(args, "from_taproot", False):
+        config.start_height = TAPROOT_ACTIVATION_HEIGHT
+    elif getattr(args, "from_genesis", False):
+        config.start_height = COUNTERS_GENESIS_HEIGHT
 
     if args.command in ("index", "run"):
         indexer = Indexer(config)

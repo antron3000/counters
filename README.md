@@ -42,18 +42,21 @@ pip install -e .          # installs deps + the `counters` console command
 | `BTC_RPC_USER` / `BTC_RPC_PASSWORD` | — | fallback if no cookie |
 | `CP_API_URL` | `http://127.0.0.1:4000` | Counterparty Core v2 API |
 | `COUNTER_DATA_DIR` | `data/` | SQLite + blobs location |
-| `COUNTER_START_HEIGHT` | `709632` | first block to scan (taproot activation) |
+| `COUNTER_START_HEIGHT` | `0` | first block a fresh scan starts at |
 | `COUNTER_CONFIRMATIONS` | `0` | blocks behind tip to stay |
 | `COUNTER_POLL_INTERVAL` | `15` | seconds between tip polls in `run` |
 
-> Counters require a taproot script-path reveal, so none can exist before
-> taproot activation (mainnet block 709632) — that's the default first-time
-> scan floor. Set `COUNTER_START_HEIGHT` higher (near the tip) for fast test
-> iteration; numbering within a fixed range is identical either way.
+> A fresh scan starts at **block 0** (exhaustive) by default. Two flags raise
+> the floor when you trust an earlier point can't matter:
 >
-> **To rescan from scratch, delete the data dir first** (`rm -rf data`).
-> Stored sync progress always takes precedence over `COUNTER_START_HEIGHT`,
-> so the start height only applies on a fresh database.
+> - `--from-taproot` — start at taproot activation (block 709632); a taproot
+>   witness reveal can't exist before it.
+> - `--from-genesis` — start at the counters genesis block (955251, #0);
+>   by protocol nothing valid precedes #0.
+>
+> `COUNTER_START_HEIGHT` sets the same floor via env. **To rescan from scratch,
+> delete the data dir first** (`rm -rf data`). Stored sync progress always
+> takes precedence, so the start height only applies on a fresh database.
 
 ## Usage
 
@@ -62,7 +65,9 @@ Invoke as `counters <command>` after `pip install -e .`, or equivalently
 
 ```bash
 # --- indexing ---
-counters index -v                                  # continuously sync + follow the tip
+counters index -v                                  # scan from block 0, then follow the tip
+counters index --from-taproot                      # skip pre-taproot blocks (fresh DB only)
+counters index --from-genesis                      # start at counter #0's block (fresh DB only)
 counters sync --stop-at 720000                     # one-shot catch-up (bounded for tests)
 
 # --- reads (need only a synced index) ---
