@@ -1,10 +1,11 @@
-# Counterparty Inscriptions Indexer (Bitcoin Counters) — MVP
+# Bitcoin Counters — Indexer & Wallet
 
-Indexes **Bitcoin Counters**: files stored in Bitcoin witness data (a `COUNT`
-envelope) and bound to a Counterparty asset minted in the same transaction.
+**Counters** are files stored in Bitcoin witness data (a `COUNT` envelope) and
+bound to a Counterparty asset minted in the same transaction.
 
-This is the MVP: **parse → join → number → store**, plus a tip-follow loop.
-Reorg renumbering and a read/serve API are deliberately out of scope for now.
+This tool **indexes** them (parse → join → number → store), **mints** and
+**transfers** them via a built-in taproot wallet, and **serves** a web explorer
+plus a read-only JSON API.
 
 ## How it works
 
@@ -46,17 +47,11 @@ pip install -e .          # installs deps + the `counters` console command
 | `COUNTER_CONFIRMATIONS` | `0` | blocks behind tip to stay |
 | `COUNTER_POLL_INTERVAL` | `15` | seconds between tip polls in `run` |
 
-> A fresh scan starts at **block 0** (exhaustive) by default. Two flags raise
-> the floor when you trust an earlier point can't matter:
->
-> - `--from-taproot` — start at taproot activation (block 709632); a taproot
->   witness reveal can't exist before it.
-> - `--from-genesis` — start at the counters genesis block (955251, #0);
->   by protocol nothing valid precedes #0.
->
-> `COUNTER_START_HEIGHT` sets the same floor via env. **To rescan from scratch,
-> delete the data dir first** (`rm -rf data`). Stored sync progress always
-> takes precedence, so the start height only applies on a fresh database.
+> A fresh scan starts at **block 0**. Raise the floor with `--from-taproot`
+> (block 709632 — no taproot reveal can exist earlier) or `--from-genesis`
+> (block 955251 — counter #0; nothing valid precedes it), or set
+> `COUNTER_START_HEIGHT`. Stored progress always wins, so this only applies to a
+> fresh DB — to rescan, `rm -rf data` first.
 
 ## Usage
 
@@ -136,6 +131,7 @@ counters/
     read.py         status / info / list / validate
     wallet.py       create / restore / receive / balance / inscriptions
     inscribe.py     mint flow: compose issuance + build/sign commit & reveal
+    send.py         transfer a counter (compose send + sign + broadcast)
     serve.py        server command entry point
   server/           web explorer + read-only JSON API
     app.py          stdlib HTTP server (static SPA + /counters /counter /content)
@@ -145,14 +141,3 @@ docs/               protocol + CLI reference PDFs
 tests/
   test_envelope.py  parser unit tests
 ```
-
-## Not yet implemented (v2+)
-
-- Reorg detection + renumbering with a finality depth
-- Frozen marker/genesis height + canonical test vectors
-- Gate indexing on Counterparty Core's processed height (don't index ahead of
-  the oracle when Core lags bitcoind, or issuances for a block may be missed)
-
-> `inscribe` is implemented (commit/reveal + OP_RETURN issuance). Every mint is
-> package-validated with `testmempoolaccept` before any funds move; `--dry-run`
-> stops there and prints the raw hex.
