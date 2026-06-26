@@ -4,8 +4,9 @@
 bound to a Counterparty asset minted in the same transaction.
 
 This tool **indexes** them (parse → join → number → store), **mints** and
-**transfers** them via a built-in taproot wallet, and **serves** a web explorer
-plus a read-only JSON API.
+**transfers** them using a taproot (BIP86) wallet kept inside **Bitcoin Core**
+(Core holds the keys and signs; this is the same wallet `bitcoin-cli` manages),
+and **serves** a web explorer plus a read-only JSON API.
 
 ## How it works
 
