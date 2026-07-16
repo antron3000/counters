@@ -421,7 +421,7 @@ counters wallet --name me inscribe --file v2.png --asset RAREPEPE --reinscribe</
       <p>Point the <code>API</code> constant at the top of this file's script at your server and the sample data is replaced by live results.</p>
 
       <h2 id="source">Source</h2>
-      <p>Counters is open source — the indexer, CLI, and this explorer all live in one repository: <a href="https://github.com/antron3000/counters" target="_blank" rel="noopener" class="out">github.com/antron3000/counters ↗</a>.</p>
+      <p>Counters is open source — the indexer, CLI, and this explorer all live in one repository: <a href="https://github.com/BitcoinCounters/counters-proto" target="_blank" rel="noopener" class="out">github.com/BitcoinCounters/counters-proto ↗</a>.</p>
 
       <h2 id="community">Community</h2>
       <p>Join the conversation on Telegram: <a href="https://t.me/BitcoinCounters" target="_blank" rel="noopener" class="out">t.me/BitcoinCounters ↗</a>.</p>
@@ -670,7 +670,7 @@ async function showBuild(){
   let commit='dev';
   try{ const st=await getStatus(); if(st&&st.commit) commit=st.commit; }catch(_){}
   e.innerHTML = (commit && commit!=='dev')
-    ? `build <a href="https://github.com/antron3000/counters/commit/${encodeURIComponent(commit)}" target="_blank" rel="noopener"><code>${esc(commit)}</code></a>`
+    ? `build <a href="https://github.com/BitcoinCounters/counters-proto/commit/${encodeURIComponent(commit)}" target="_blank" rel="noopener"><code>${esc(commit)}</code></a>`
     : `build <code>${esc(commit)}</code>`;
 }
 
