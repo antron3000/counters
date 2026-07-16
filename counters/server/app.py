@@ -391,7 +391,7 @@ class Handler(BaseHTTPRequestHandler):
 def make_server(config: Config, host: str = "127.0.0.1", port: int = 8081) -> ThreadingHTTPServer:
     """Build (but do not start) the explorer HTTP server. The caller drives it —
     either blocking via run() for a serve-only process, or on a background thread
-    when `counters server` also runs the indexer in the foreground."""
+    when `counters-proto server` also runs the indexer in the foreground."""
     httpd = ThreadingHTTPServer((host, port), Handler)
     httpd.config = config  # type: ignore[attr-defined]
     return httpd

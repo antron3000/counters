@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "counters"
+name = "counters-proto"
 version = "0.1.0"
 description = "Counterparty Inscriptions (Bitcoin Counters) — CLI and indexer"
 requires-python = ">=3.10"
@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-counters = "counters.__main__:main"
+counters-proto = "counters.__main__:main"
 
 [tool.setuptools.packages.find]
 include = ["counters*"]

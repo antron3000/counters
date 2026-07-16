@@ -1,4 +1,4 @@
-"""`counters wallet send` — transfer a counter (its Counterparty asset).
+"""`counters-proto wallet send` — transfer a counter (its Counterparty asset).
 
 A counter is owned by whoever holds its Counterparty asset balance, so
 transferring ownership is a plain Counterparty *send*: compose the OP_RETURN

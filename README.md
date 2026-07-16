@@ -112,55 +112,55 @@ Core running on the host.
 
 ## Usage
 
-Invoke as `counters <command>` after `pip install -e .`, or equivalently
+Invoke as `counters-proto <command>` after `pip install -e .`, or equivalently
 `python -m counters <command>`.
 
 ```bash
 # --- indexing ---
-counters index -v                                  # scan from block 0, then follow the tip
-counters index --from-taproot                      # skip pre-taproot blocks (fresh DB only)
-counters index --from-genesis                      # start at counter #0's block (fresh DB only)
-counters sync --stop-at 720000                     # one-shot catch-up (bounded for tests)
+counters-proto index -v                                  # scan from block 0, then follow the tip
+counters-proto index --from-taproot                      # skip pre-taproot blocks (fresh DB only)
+counters-proto index --from-genesis                      # start at counter #0's block (fresh DB only)
+counters-proto sync --stop-at 720000                     # one-shot catch-up (bounded for tests)
 
 # --- reads (need only a synced index) ---
-counters status                                    # bitcoind / Counterparty / index heights
-counters list                                      # 20 most recent
-counters list --recent 50
-counters list --owner bc1p...                      # by mint-time owner
-counters list --block 800000-800100                # by block range
-counters info 0                                    # metadata by number
-counters info RAREPEPE                             # ...or by asset name / longname
-counters info 0 --json                             # metadata as JSON
-counters info 0 --raw > cat.png                     # stream the file bytes
-counters info 0 --save cat.png                      # write the file to disk
-counters validate <txid>                           # is this tx a counter, and why / why not
+counters-proto status                                    # bitcoind / Counterparty / index heights
+counters-proto list                                      # 20 most recent
+counters-proto list --recent 50
+counters-proto list --owner bc1p...                      # by mint-time owner
+counters-proto list --block 800000-800100                # by block range
+counters-proto info 0                                    # metadata by number
+counters-proto info RAREPEPE                             # ...or by asset name / longname
+counters-proto info 0 --json                             # metadata as JSON
+counters-proto info 0 --raw > cat.png                     # stream the file bytes
+counters-proto info 0 --save cat.png                      # write the file to disk
+counters-proto validate <txid>                           # is this tx a counter, and why / why not
 
 # --- web explorer + read-only JSON API ---
-counters server                                    # indexer + explorer on http://127.0.0.1:8081
-counters server --no-index                         # serve only (index runs elsewhere)
-counters server --host 0.0.0.0 --port 8081         # bind publicly / pick a port
+counters-proto server                                    # indexer + explorer on http://127.0.0.1:8081
+counters-proto server --no-index                         # serve only (index runs elsewhere)
+counters-proto server --host 0.0.0.0 --port 8081         # bind publicly / pick a port
 
 # --- wallet (taproot BIP86, bc1p; keys held by Bitcoin Core) ---
-counters wallet --name mywallet create             # new wallet; prints a 12-word seed ONCE
-counters wallet --name mywallet restore            # re-import from a BIP39 seed (read on stdin) + rescan
+counters-proto wallet --name mywallet create             # new wallet; prints a 12-word seed ONCE
+counters-proto wallet --name mywallet restore            # re-import from a BIP39 seed (read on stdin) + rescan
 
 # recover an OLD Counterparty wallet (Counterwallet / Freewallet — pre-BIP39 Electrum v1, legacy 1... addresses).
 # The seed type is auto-detected; --counterwallet only forces it for a phrase valid as BOTH schemes. See wallets.md.
-counters wallet --name old restore --dry-run                   # preview the derived 1... addresses; imports nothing
-counters wallet --name old restore                             # import the legacy keys into Core + rescan
-counters wallet --name mywallet receive            # next taproot (bc1p) address
-counters wallet --name mywallet balance            # BTC + aggregated Counterparty balances
-counters wallet --name mywallet inscriptions       # counters held by the wallet
-counters wallet --name mywallet send RAREPEPE 1 bc1p...        # transfer a counter
-counters wallet --name mywallet send RAREPEPE 1 bc1p... --dry-run  # compose+sign, no broadcast
+counters-proto wallet --name old restore --dry-run                   # preview the derived 1... addresses; imports nothing
+counters-proto wallet --name old restore                             # import the legacy keys into Core + rescan
+counters-proto wallet --name mywallet receive            # next taproot (bc1p) address
+counters-proto wallet --name mywallet balance            # BTC + aggregated Counterparty balances
+counters-proto wallet --name mywallet inscriptions       # counters held by the wallet
+counters-proto wallet --name mywallet send RAREPEPE 1 bc1p...        # transfer a counter
+counters-proto wallet --name mywallet send RAREPEPE 1 bc1p... --dry-run  # compose+sign, no broadcast
 
 # mint a counter from a file (commit + reveal). --dry-run builds, signs, and
 # package-validates both txs WITHOUT broadcasting (prints raw hex + cost).
-counters wallet --name mywallet inscribe --file cat.png --dry-run
-counters wallet --name mywallet inscribe --file cat.png                    # free numeric asset
-counters wallet --name mywallet inscribe --file cat.png --asset ZOMBIEPEPES # named (0.5 XCP)
-counters wallet --name mywallet inscribe --file v2.png --asset RAREPEPE --reinscribe  # attach to an asset whose issuance rights you hold (no new asset, no XCP)
-counters wallet --name mywallet inscribe --file cat.png --fee-rate 8 --commit-fee-rate 4
+counters-proto wallet --name mywallet inscribe --file cat.png --dry-run
+counters-proto wallet --name mywallet inscribe --file cat.png                    # free numeric asset
+counters-proto wallet --name mywallet inscribe --file cat.png --asset ZOMBIEPEPES # named (0.5 XCP)
+counters-proto wallet --name mywallet inscribe --file v2.png --asset RAREPEPE --reinscribe  # attach to an asset whose issuance rights you hold (no new asset, no XCP)
+counters-proto wallet --name mywallet inscribe --file cat.png --fee-rate 8 --commit-fee-rate 4
 ```
 
 > The 12-word seed is the only backup and is shown once at create time. The

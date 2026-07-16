@@ -72,11 +72,11 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     parser = argparse.ArgumentParser(
-        prog="counters",
+        prog="counters-proto",
         description="Counterparty Inscriptions (Bitcoin Counters) — CLI + indexer",
         parents=[common],
         formatter_class=_OrdStyleHelp,
-        usage="counters [OPTIONS] <COMMAND>",
+        usage="counters-proto [OPTIONS] <COMMAND>",
     )
     parser.set_defaults(verbose=False)
     parser._optionals.title = "Options"
@@ -123,7 +123,7 @@ def main(argv: list[str] | None = None) -> int:
     p_server.add_argument("--port", type=int, default=8081, help="port (default: 8081)")
     p_server.add_argument(
         "--no-index", action="store_true",
-        help="serve only; do not run the indexer (e.g. when `counters index` "
+        help="serve only; do not run the indexer (e.g. when `counters-proto index` "
              "already runs in a separate process)",
     )
 
@@ -147,7 +147,7 @@ def main(argv: list[str] | None = None) -> int:
     p_val.add_argument("txid")
 
     # --- wallet (taproot BIP86; keys held by Bitcoin Core) ---
-    # --name is a wallet-level option (counters wallet --name abc create); it is
+    # --name is a wallet-level option (counters-proto wallet --name abc create); it is
     # also accepted after the subcommand via the SUPPRESS-default parent so it
     # never clobbers the wallet-level value when absent.
     wname = argparse.ArgumentParser(add_help=False)
@@ -157,7 +157,7 @@ def main(argv: list[str] | None = None) -> int:
         parents=[common],
         help="taproot wallet (keys in Bitcoin Core)",
         formatter_class=_OrdStyleHelp,
-        usage="counters wallet [--name NAME] <COMMAND>",
+        usage="counters-proto wallet [--name NAME] <COMMAND>",
     )
     p_wallet.add_argument("--name", default="counter", help="Core wallet name (default: counter)")
     p_wallet._optionals.title = "Options"

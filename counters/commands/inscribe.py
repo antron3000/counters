@@ -1,4 +1,4 @@
-"""`counters wallet inscribe` — mint a counter from a file (commit + reveal).
+"""`counters-proto wallet inscribe` — mint a counter from a file (commit + reveal).
 
 Flow (build ref §5, CLI ref §3), designed to work from a single funding UTXO:
   1. Build the COUNT envelope tapscript from the file; derive the P2TR commit
@@ -416,7 +416,7 @@ def _wallet_change_address(btc: BitcoindClient, wallet: str) -> str:
             raise BitcoindError(
                 f"wallet {wallet!r} cannot produce a change address and has no known "
                 f"addresses to reuse — fund it, or inscribe from a wallet made with "
-                f"`counters wallet create`."
+                f"`counters-proto wallet create`."
             )
         return addrs[0]
 
@@ -497,7 +497,7 @@ def _prepare_named(btc, cp, wallet, insc, asset, quantity, divisible,
     if xcp_addr is None:
         print(f"no wallet address holds the {NAMED_ISSUANCE_FEE_XCP / COIN:.1f} XCP "
               f"required to register a named asset. Fund a counter address with "
-              f"XCP first (`counters wallet --name {wallet} receive`), then retry.",
+              f"XCP first (`counters-proto wallet --name {wallet} receive`), then retry.",
               file=sys.stderr)
         return None
     commit = _build_commit(btc, wallet, insc.commit_address, DUST,

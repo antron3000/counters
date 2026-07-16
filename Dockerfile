@@ -22,5 +22,5 @@ EXPOSE 8081
 
 VOLUME ["/data"]
 
-ENTRYPOINT ["counters"]
+ENTRYPOINT ["counters-proto"]
 CMD ["server", "--host", "0.0.0.0", "--port", "8081"]
